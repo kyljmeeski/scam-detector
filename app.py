@@ -17,6 +17,7 @@ from Transcription import Transcription
 SIMILARITY_THRESHOLD = 0.6 # настолько предложение должна быть похожа на фразу
 SIGNATURE_THRESHOLD = 2 # вот на столько фраз должно быть похоже предложение
 MARKERS_THRESHOLD = 3 # вот столько подозрительных предложений должно быть
+NUMBERS = ["996708584859"]
 
 SEMANTIC_ANALYZER = SentenceTransformer("paraphrase-multilingual-MiniLM-L12-v2")
 # SEMANTIC_ANALYZER.save('paraphrase-multilingual-MiniLM-L12-v2')  # for the first time only -- to save locally
@@ -57,6 +58,19 @@ def load_signatures() -> Dict[str, List[str]]:
     for signature, sentences in data.items():
         signatures[signature] = sentences
     return signatures
+
+
+@app.route('/scam', methods=['GET'])
+def check_number() -> bool:
+    number = request.args.get("number")
+    return number in NUMBERS
+
+
+@app.route("/scam", methods=['POST'])
+def add_number():
+    data = request.get_json()
+    number = data.get("number")
+    NUMBERS.append(number)
 
 
 @app.route('/analyze', methods=['POST'])
